@@ -1,0 +1,102 @@
+
+@baseUrl = http://localhost:8000
+@productoId = 1
+@clienteEmail = COMPLETAR_EMAIL_DE_CLIENTE
+@clientePassword = COMPLETAR_PASSWORD_DE_CLIENTE
+@adminEmail = COMPLETAR_EMAIL_DE_ADMIN
+@adminPassword = COMPLETAR_PASSWORD_DE_ADMIN
+
+### 0. INICIAR SESION COMO CLIENTE
+POST {{baseUrl}}/api/v1/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username={{clienteEmail}}&password={{clientePassword}}&grant_type=password
+
+### 1. LISTAR PEDIDOS PROPIOS
+GET {{baseUrl}}/pedidos/
+
+### 2. CREAR PEDIDO COMO CLIENTE
+# @name crearPedido
+POST {{baseUrl}}/pedidos/
+Content-Type: application/json
+
+{
+    "detalles": [
+    {
+        "producto_id": {{productoId}},
+        "cantidad": 2
+    }
+    ]
+}
+
+### 3. OBTENER PEDIDO PROPIO
+GET {{baseUrl}}/pedidos/{{crearPedido.response.body.$.id}}
+
+### 4. CLIENTE NO PUEDE ACTUALIZAR PEDIDOS (403)
+PUT {{baseUrl}}/pedidos/{{crearPedido.response.body.$.id}}
+Content-Type: application/json
+
+{
+    "estado": "CANCELADO"
+}
+
+### 5. INICIAR SESION COMO ADMIN
+POST {{baseUrl}}/api/v1/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username={{adminEmail}}&password={{adminPassword}}&grant_type=password
+
+### 6. ADMIN LISTA TODOS LOS PEDIDOS
+GET {{baseUrl}}/pedidos/
+
+### 7. ADMIN ACTUALIZA EL PEDIDO
+PUT {{baseUrl}}/pedidos/{{crearPedido.response.body.$.id}}
+Content-Type: application/json
+
+{
+    "estado": "CONFIRMADO"
+}
+
+### 8. ADMIN ELIMINA EL PEDIDO
+DELETE {{baseUrl}}/pedidos/{{crearPedido.response.body.$.id}}
+
+### 9. ERROR 422 - SIN DETALLES
+POST {{baseUrl}}/pedidos/
+Content-Type: application/json
+
+{
+    "detalles": []
+}
+
+### 10. ERROR 422 - PRODUCTO REPETIDO
+POST {{baseUrl}}/pedidos/
+Content-Type: application/json
+
+{
+    "detalles": [
+    {
+        "producto_id": {{productoId}},
+        "cantidad": 2
+    },
+    {
+        "producto_id": {{productoId}},
+        "cantidad": 3
+    }
+  ]
+}
+
+### 11. ERROR 404 - PEDIDO INEXISTENTE
+GET {{baseUrl}}/pedidos/999999
+
+### 12. ERROR 404 - PRODUCTO INEXISTENTE
+POST {{baseUrl}}/pedidos/
+Content-Type: application/json
+
+{
+    "detalles": [
+    {
+        "producto_id": 999999,
+        "cantidad": 1
+    }
+    ]
+}
