@@ -2,7 +2,7 @@
 
 Trabajo Práctico Integrador de Programación 4. Aplicación web de pedidos con backend FastAPI/SQLModel y frontend React/TypeScript.
 
-- **Repositorio público:** https://github.com/JohnTheMano/TP8-Programacion-IV
+- **Repositorio público:** https://github.com/JohnTheMano/Food-Store
 - **Video demostración:**  https://youtu.be/U9l9ZtWagSU
 
 ## Requisitos
