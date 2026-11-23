@@ -16,10 +16,12 @@ from app.modules.pedidos import model as pedido_model
 from app.modules.usuarios import model as usuarios_model
 from app.modules.auth.router import router as auth_router
 from app.modules.usuarios.router import router as usuarios_router
+from seed import seed
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     SQLModel.metadata.create_all(engine)
+    seed()
     if engine.dialect.name == "postgresql":
         with engine.begin() as connection:
             connection.execute(

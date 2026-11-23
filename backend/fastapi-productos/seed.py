@@ -5,6 +5,7 @@ from app.core.security import hash_password
 from app.modules.categorias.model import Categoria
 from app.modules.productos.model import Producto
 from app.modules.usuarios.model import Usuario
+from app.modules.pedidos.model import Pedido, DetallePedido
 
 
 CATEGORIES = [
@@ -28,17 +29,47 @@ PRODUCTS = [
 def seed():
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
-        admin = session.exec(select(Usuario).where(Usuario.username == "admin")).first()
-        if admin is None:
-            admin = Usuario(
-                username="admin",
-                full_name="Administrador",
-                email="admin@foodstore.local",
-                hashed_password=hash_password("Admin1234!"),
-                role="admin",
-                disabled=False,
-            )
-            session.add(admin)
+        usuarios_iniciales = [
+            (
+                "admin",
+                "Administrador",
+                "admin@foodstore.com",
+                "Prueba2026!",
+                "admin",
+            ),
+            (
+                "usuario.prueba",
+                "Usuario de prueba",
+                "usuario@gmail.com",
+                "Prueba2026!",
+                "user",
+            ),
+        ]
+
+        for username, full_name, email, password, role in usuarios_iniciales:
+            usuario = session.exec(
+                select(Usuario).where(
+                    (Usuario.username == username) | (Usuario.email == email)
+                )
+            ).first()
+            if usuario is None:
+                usuario = Usuario(
+                    username=username,
+                    full_name=full_name,
+                    email=email,
+                    hashed_password=hash_password(password),
+                    role=role,
+                    disabled=False,
+                )
+                session.add(usuario)
+            else:
+                usuario.username = username
+                usuario.full_name = full_name
+                usuario.email = email
+                usuario.hashed_password = hash_password(password)
+                usuario.role = role
+                usuario.disabled = False
+                session.add(usuario)
 
         categories = {}
         for name, description in CATEGORIES:
